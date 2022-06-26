@@ -1,4 +1,5 @@
 <?php
+
 namespace components;
 
 /**
@@ -11,19 +12,19 @@ class Db
 
 
 	/**
-  * Устанавливает соединение с базой данных
-  * @return \PDO <p>Объект класса PDO для работы с БД</p>
-  */
+	 * Устанавливает соединение с базой данных
+	 * @return \PDO <p>Объект класса PDO для работы с БД</p>
+	 */
 	public static function getConnection()
 	{
 		if (!static::$connection) {
-			try { 
-                            static::$connection = new \PDO(
-						"mysql:host=" . HOST . ";dbname=" . DB_NAME, 
-						USER,
-						PASS
-					);
-			} catch(Exception $e) {
+
+			try {
+
+				// создаём объект класса: PDO (и возвращаем его)
+				static::$connection = new \PDO("mysql:host=" . HOST . ";dbname=" . DB_NAME, USER, PASS);
+			} catch (Exception $e) {
+
 				die($e->getMessage());
 			}
 		}
@@ -31,14 +32,11 @@ class Db
 		return static::$connection;
 	}
 
-	private function __construct(){
-            
-        }
-        
-        private function __clone() {
-        
-        }
-        
-        
+	private function __construct()
+	{
+	}
 
+	private function __clone()
+	{
+	}
 }

@@ -14,20 +14,94 @@ class Product
 	const SHOW_BY_DEFAULT = 6;
 
 	/**
-	 * Возвращает массив последних товаров
+	 * Возвращает массив новых товаров (новинки)
 	 * @param type $count [optional] <p>Количество</p>
 	 * @param type $page [optional] <p>Номер текущей страницы</p>
 	 * @return array <p>Массив с товарами</p>
 	 */
+	// на вход: количество товаров, которые хотим получить
 	public static function getLatestProducts($count = self::SHOW_BY_DEFAULT)
 	{
 		// Соединение с БД
 		$db = Db::getConnection();
 
+		$productsList = [];
+
 		// Текст запроса к БД
 		$sql = 'SELECT id, name, price, is_new FROM product '
-			. 'WHERE status = "1" ORDER BY id DESC '
+			. 'WHERE status = "1" AND is_new = "1" ORDER BY id DESC '
 			. 'LIMIT :count';
+
+		// Используется подготовленный запрос
+		$result = $db->prepare($sql);
+		$result->bindParam(':count', $count, \PDO::PARAM_INT);
+
+		// Указываем, что хотим получить данные в виде массива
+		// индексированного именами столбцов результирующего набора
+		$result->setFetchMode(\PDO::FETCH_ASSOC);
+
+		// Выполнение команды
+		$result->execute();
+
+		// Получение и возврат результатов
+		$i = 0;
+
+		// кладём данные в результирующий массив
+		while ($row = $result->fetch()) {
+			$productsList[$i]['id'] = $row['id'];
+			$productsList[$i]['name'] = $row['name'];
+			$productsList[$i]['price'] = $row['price'];
+			$productsList[$i]['is_new'] = $row['is_new'];
+			$i++;
+		}
+
+		return $productsList;
+	}
+
+	/**
+	 * Возвращает список рекомендуемых товаров
+	 * @return array <p>Массив с товарами</p>
+	 */
+	public static function getRecommendedProducts()
+	{
+		// Соединение с БД
+		$db = Db::getConnection();
+
+		$productsList = [];
+
+		$sql = 'SELECT id, name, price, is_new FROM product '
+			. 'WHERE status = "1" AND is_recommended = "1" '
+			. 'ORDER BY id DESC';
+
+		// Получение результатов запроса (из БД)
+		$result = $db->query($sql);
+
+		$i = 0;
+
+		// выводим результаты в цикле и сохраняем в виде массива 
+		while ($row = $result->fetch()) {
+			$productsList[$i]['id'] = $row['id'];
+			$productsList[$i]['name'] = $row['name'];
+			$productsList[$i]['price'] = $row['price'];
+			$productsList[$i]['is_new'] = $row['is_new'];
+			$i++;
+		}
+
+		return $productsList;
+	}
+
+
+	/* public static function getRecommendedProducts($count = self::SHOW_BY_DEFAULT)
+	{
+		// Соединение с БД
+		$db = Db::getConnection();
+
+		$productsList = [];
+
+		$sql = 'SELECT id, name, price, image, is_new FROM product '
+			. 'WHERE status = "1" AND is_recommended = "1"'
+			. 'ORDER BY id DESC '
+			. 'LIMIT :count ';
 
 		// Используется подготовленный запрос
 		$result = $db->prepare($sql);
@@ -43,17 +117,19 @@ class Product
 		// Получение и возврат результатов
 
 		$i = 0;
-		$productsList = [];
+
+		// кладём данные в результирующий массив
 		while ($row = $result->fetch()) {
 			$productsList[$i]['id'] = $row['id'];
 			$productsList[$i]['name'] = $row['name'];
 			$productsList[$i]['price'] = $row['price'];
+			$productsList[$i]['image'] = $row['image'];
 			$productsList[$i]['is_new'] = $row['is_new'];
 			$i++;
-		}
+		}		
 
 		return $productsList;
-	}
+	} */
 
 	/**
 	 * Возвращает список товаров в указанной категории
@@ -64,14 +140,16 @@ class Product
 	public static function getProductsListByCategory($categoryId, $page = 1)
 	{
 		$limit = Product::SHOW_BY_DEFAULT;
-		// Смещение (для запроса)
+		// Смещение для запроса (при построении постраничной навигации)
 		$offset = ($page - 1) * self::SHOW_BY_DEFAULT;
 
 		// Соединение с БД
 		$db = Db::getConnection();
 
+		$products = [];
+
 		// Текст запроса к БД
-		$sql = 'SELECT id, name, price, is_new FROM product '
+		$sql = 'SELECT id, name, price, image, is_new FROM product '
 			. 'WHERE status = 1 AND category_id = :category_id '
 			. 'ORDER BY id ASC LIMIT :limit OFFSET :offset';
 
@@ -85,11 +163,12 @@ class Product
 		$result->execute();
 
 		$i = 0;
-		$products = [];
+
 		while ($row = $result->fetch()) {
 			$products[$i]['id'] = $row['id'];
 			$products[$i]['name'] = $row['name'];
 			$products[$i]['price'] = $row['price'];
+			$products[$i]['image'] = $row['image'];
 			$products[$i]['is_new'] = $row['is_new'];
 			$i++;
 		}
@@ -148,11 +227,14 @@ class Product
 
 		// Возвращаем значение count - количество
 		$row = $result->fetch();
-		return $row['count'];
+
+		if ($row != false) {
+			return $row['count'];
+		}
 	}
 
 	/**
-	 * Возвращает список товаров с указанными индентификторами
+	 * Возвращает из БД информацию о товарах по указанным индентификторами
 	 * @param array $idsArray <p>Массив с идентификаторами</p>
 	 * @return array <p>Массив со списком товаров</p>
 	 */
@@ -187,39 +269,7 @@ class Product
 		return $products;
 	}
 
-	/**
-	 * Возвращает список рекомендуемых товаров
-	 * @return array <p>Массив с товарами</p>
-	 */
-	public static function getRecommendedProducts()
-	{
-		// Соединение с БД
-		$db = Db::getConnection();
 
-		$productsList = [];
-
-		$sql = 'SELECT id, name, price, is_new FROM product '
-			. 'WHERE status = "1" AND is_recommended = "1"'
-			. 'ORDER BY id DESC ';
-
-		// Получение и возврат результатов
-		$result = $db->query($sql);
-
-		if ($result != false) {
-
-			$i = 0;
-
-			while ($row = $result->fetch()) {
-				$productsList[$i]['id'] = $row['id'];
-				$productsList[$i]['name'] = $row['name'];
-				$productsList[$i]['price'] = $row['price'];
-				$productsList[$i]['is_new'] = $row['is_new'];
-				$i++;
-			}
-		};
-
-		return $productsList;
-	}
 
 	/**
 	 * Возвращает список товаров
@@ -254,7 +304,7 @@ class Product
 		// Соединение с БД
 		$db = Db::getConnection();
 
-		// Текст запроса к БД
+		// Текст запроса к БД (используем подготовленный запрос)
 		$sql = 'DELETE FROM product WHERE id = :id';
 
 		// Получение и возврат результатов. Используется подготовленный запрос

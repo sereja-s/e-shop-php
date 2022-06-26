@@ -8,7 +8,7 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background:;
+    background: #fff;
     position: relative;
     font-weight:400px;
 }
@@ -898,14 +898,14 @@ h2.title {
 
 .productinfo p{
     font-family: 'Roboto', sans-serif;
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 400;
     height: 34px;
     color: #696763;
 }
 
 .productinfo img{
-    width: 100%;
+   max-width: 100%; 
 }
 
 .productinfo{
@@ -921,7 +921,7 @@ h2.title {
     transition: height 500ms ease 0s;
     width: 100%;
     display: block;
-    opacity:;
+    opacity: 1;
 }
 
 .single-products:hover .product-overlay {

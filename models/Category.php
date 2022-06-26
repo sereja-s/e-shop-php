@@ -22,7 +22,7 @@ class Category
 		$categoryList = [];
 
 		// Запрос к БД
-		$sql = "SELECT id, name FROM category ORDER BY sort_order ASC";
+		$sql = "SELECT id, name FROM category WHERE status = '1' ORDER BY sort_order ASC";
 		$result = $db->query($sql);
 
 		// Получение и возврат результатов
@@ -31,6 +31,8 @@ class Category
 
 			$i = 0;
 
+			// Метод fetch()- возвращает 1-ну запись (строку) из всех выбранных SQL-запросом
+			// (если в выборку попали несколько записей, то в цикле можно получить следующий элемент)
 			while ($row = $result->fetch()) {
 				$categoryList[$i]['id'] = $row['id'];
 				$categoryList[$i]['name'] = $row['name'];

@@ -8,6 +8,6 @@ const PATH = '/'; // путь к корню сайта
 const HOST = 'localhost';
 const USER = 'root';
 const PASS = '';
-const DB_NAME = 'phpshop';
+const DB_NAME = 'e-shop';
 // Префикс для подключения контроллеров
-define('PATH_PREFIX','controllers/');
+define('PATH_PREFIX', 'controllers/');

@@ -7,121 +7,120 @@ use models\User;
 /**
  * Контроллер UserController
  */
-class UserController {
-    
-    /**
-     * Action для страницы "Регистрация"
-     */
-    public function actionRegister()
-    {
-        // Переменные для формы
-        $name = '';
-        $email = '';
-        $password = '';
-        $result = false;
-        
-        // Обработка формы
-        if (isset($_POST['submit'])) {
-            // Если форма отправлена 
-            // Получаем данные из формы
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-  
-            // Флаг ошибок
-            $errors = false;
-            
-            // Валидация полей
-            if (!User::checkName($name)) {
-                $errors[] = 'Имя не должно быть короче 2-х символов';
-            }
-         
-            if (!User::checkEmail($email)) {
-                $errors[] = 'Неправильный email';
-            }
-            
-            if (!User::checkPassword($password)) {
-                $errors[] = 'Пароль не должен быть короче 6-ти символов';
-            }
-            
-            if (User::checkEmailExists($email)) {
-                $errors[] = 'Такой email уже используется';
-            }
-    
-            // Если ошибок нет
-            // Регистрируем пользователя
-            if ($errors == false) {
-                $result = User::register($name, $email, $password);
-            }
+class UserController
+{
 
-        }
+	/**
+	 * Action для страницы "Регистрация"
+	 */
+	public function actionRegister()
+	{
+		// Переменные для формы
+		$name = '';
+		$email = '';
+		$password = '';
+		$result = false;
 
-        // Подключаем вид
-        require_once('views/user/register.php');
+		// Обработка формы (после того как пользователь заполнил её и отправил)
+		if (isset($_POST['submit'])) {
+			// Если форма отправлена 
+			// Получаем данные из формы
+			$name = $_POST['name'];
+			$email = $_POST['email'];
+			$password = $_POST['password'];
 
-        return true;
-    }
-    
-    /**
-     * Action для страницы "Вход на сайт"
-     */
-    public function actionLogin()
-    {
-        // Переменные для формы
-        $email = '';
-        $password = '';
-        
-        // Обработка формы
-        if (isset($_POST['submit'])) {
-            // Если форма отправлена 
-            // Получаем данные из формы
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-            
-            // Флаг ошибок
-            $errors = false;
-                        
-            // Валидация полей
-            if (!User::checkEmail($email)) {
-                $errors[] = 'Неправильный email';
-            }            
-            if (!User::checkPassword($password)) {
-                $errors[] = 'Пароль не должен быть короче 6-ти символов';
-            }
-            
-            // Проверяем существует ли пользователь
-            $userId = User::checkUserData($email, $password);
- 
-            if ($userId == false) {
-                // Если данные неправильные - показываем ошибку
-                $errors[] = 'Неправильные данные для входа на сайт';
-            } else {
-                // Если данные правильные, запоминаем пользователя (сессия)
-                User::auth($userId);
+			// Флаг ошибок
+			$errors = false;
 
-                // Перенаправляем пользователя в закрытую часть - кабинет 
-                header("Location: /cabinet"); 
-            }
+			// Валидация полей
+			if (!User::checkName($name)) {
+				$errors[] = 'Имя не должно быть короче 2-х символов';
+			}
 
-        }
+			if (!User::checkEmail($email)) {
+				$errors[] = 'Неправильный email';
+			}
 
-        // Подключаем вид
-        require_once('views/user/login.php');
+			if (!User::checkPassword($password)) {
+				$errors[] = 'Пароль не должен быть короче 6-ти символов';
+			}
 
-        return true;
-    }
-    
-    /**
-     * Удаляем данные о пользователе из сессии
-     */
-    public function actionLogout()
-    {
-        //session_start();
-       // Удаляем информацию о пользователе из сессии 
-        unset($_SESSION["user"]);
-        
-        // Перенаправляем пользователя на главную страницу
-        header("Location: /");
-    }
-    
+			if (User::checkEmailExists($email)) {
+				$errors[] = 'Такой email уже используется';
+			}
+
+			// Если ошибок нет
+			// Регистрируем пользователя
+			if ($errors == false) {
+				$result = User::register($name, $email, $password);
+			}
+		}
+
+		// Подключаем вид
+		require_once('views/user/register.php');
+
+		return true;
+	}
+
+	/**
+	 * Action для страницы "Вход на сайт"
+	 */
+	public function actionLogin()
+	{
+		// Переменные для формы
+		$email = '';
+		$password = '';
+
+		// Обработка формы
+		if (isset($_POST['submit'])) {
+			// Если форма отправлена 
+			// Получаем данные из формы
+			$email = $_POST['email'];
+			$password = $_POST['password'];
+
+			// Флаг ошибок
+			$errors = false;
+
+			// Валидация полей
+			if (!User::checkEmail($email)) {
+				$errors[] = 'Неправильный email';
+			}
+			if (!User::checkPassword($password)) {
+				$errors[] = 'Пароль не должен быть короче 6-ти символов';
+			}
+
+			// Проверяем существует ли пользователь
+			$userId = User::checkUserData($email, $password);
+
+			if ($userId == false) {
+				// Если данные неправильные - показываем ошибку
+				$errors[] = 'Неправильные данные для входа на сайт';
+			} else {
+				// Если данные правильные, запоминаем пользователя (сессия)
+				User::auth($userId);
+
+				// Перенаправляем пользователя в закрытую часть - кабинет 
+				// на вход передаём строку, где Location- название параметра, а /cabinet- это значение параметра
+				header("Location: /cabinet");
+			}
+		}
+
+		// Подключаем вид
+		require_once('views/user/login.php');
+
+		return true;
+	}
+
+	/**
+	 * Удаляем данные о пользователе из сессии (кнопка: Выход)
+	 */
+	public function actionLogout()
+	{
+		//session_start();
+		// Удаляем информацию о пользователе из сессии 
+		unset($_SESSION["user"]);
+
+		// Перенаправляем пользователя на главную страницу
+		header("Location: /");
+	}
 }

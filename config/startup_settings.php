@@ -28,21 +28,23 @@ function routes()
 		'product/([0-9]+)' => 'product/view/$1', // actionView в ProductController
 		// Каталог:   
 		'catalog' => 'catalog/index', // actionIndex в CatalogController
-		// Категория товаров:    
+		// Категория товаров:  
+		// (для постраничной навигации по товарам)  
 		'category/([0-9]+)/page-([0-9]+)' => 'catalog/category/$1/$2', // actionCategory в CatalogController   
 		'category/([0-9]+)' => 'catalog/category/$1',  // actionCategory в CatalogController
 		// Корзина:   
 		'cart/checkout' => 'cart/checkout', // actionCheckOut в CartController    
 		'cart/delete/([0-9]+)' => 'cart/delete/$1', // actionDelete в CartController  
-		'cart/add/([0-9]+)' => 'cart/add/$1', // actionAdd в CartController        
-		'cart/addAjax/([0-9]+)' => 'cart/addAjax/$1', // actionAdd в CartController
+		'cart/add/([0-9]+)' => 'cart/add/$1', // actionAdd в CartController 
+		// для добавления товара в корзину при помощи асинхронного запроса (ajax)       
+		'cart/addAjax/([0-9]+)' => 'cart/addAjax/$1', // actionAddAjax в CartController
 		'cart' => 'cart/index', // actionIndex в CartController    
 		// Пользователь:
-		'cabinet/edit' => 'cabinet/edit',
+		'cabinet/edit' => 'cabinet/edit', // редактирование данных (для зарегистрированных пользователей)
 		'cabinet' => 'cabinet/index',
 
-		'user/register' => 'user/register',
-		'user/login' => 'user/login',
+		'user/register' => 'user/register', // для регистрации пользователей
+		'user/login' => 'user/login', // для доступа пользователя к личным данным (кабинет) на сайте
 		'user/logout' => 'user/logout',
 		// Управление товарами:    
 		'admin/product/create' => 'adminProduct/create',
@@ -62,7 +64,7 @@ function routes()
 		// Админпанель:
 		'admin' => 'admin/index',
 		// О магазине
-		'contacts' => 'site/contact',
+		'contacts' => 'site/contact', // для отправки сообщения от пользователя к администратору
 		'about' => 'site/about',
 		// Главная страница
 		'index.php' => 'site/index', // actionIndex в SiteController   

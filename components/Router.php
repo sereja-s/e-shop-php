@@ -72,6 +72,10 @@ class Router
 
 				//echo $path;
 
+				//echo '<br>Где ищем (запрос, который набрал пользователь): ' . $uri;
+				//echo '<br>Что ищем (параметры (их совпадение шаблону)): ' . $uriPattern;
+				//echo '<br>Что обрабатывает (запрос, который набрал пользователь): ' . $uriPattern;
+
 				// Определить какой контроллер и action обрабатывают запрос, параметры
 
 				// explode()- Разделяет строку по разделителю (здесь- / )
@@ -99,11 +103,16 @@ class Router
 
 				//echo $this->action;
 
-				//echo '<br>Класс: ' . $this->controller;
-				//echo '<br>Метод: ' . $this->action;
+				//echo '<br>Имя контроллера: ' . $this->controller;
+				//echo '<br>Метод (экшен): ' . $this->action;
 
-				// определение параметров
+				// сохраняем массива параметров (если они есть, то только они останутся в массиве)
 				$this->parameters = $segments;
+
+				//echo '<pre>';
+				//print_r($this->parameters);
+				//die;
+
 				return;
 			}
 		}
